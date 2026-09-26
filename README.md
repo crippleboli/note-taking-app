@@ -96,6 +96,18 @@ notetaking-app/
 - `PUT /api/notes/<id>` - Update a note
 - `DELETE /api/notes/<id>` - Delete a note
 - `GET /api/notes/search?q=<query>` - Search notes
+- `POST /api/notes/translate` - Translate a note title and content without changing the saved note
+
+Translation request:
+```json
+{
+  "title": "My Note Title",
+  "content": "Note content here...",
+  "target_language": "Chinese"
+}
+```
+
+The response contains a `translation` object with string `title` and `content` fields, along with the selected `target_language`. Translation uses the DeepSeek `deepseek-chat` model through the OpenAI-compatible SDK; configure `OPENAI_API_KEY` in the environment or a root `.env` file. Translation prompts live in `prompts/translate_prompt.md`. The original note is not modified.
 
 ### Request/Response Format
 ```json
@@ -121,6 +133,7 @@ notetaking-app/
 - **Content Textarea**: Rich text editing area
 - **Save Button**: Manual save option (auto-save also available)
 - **Delete Button**: Remove notes with confirmation
+- **Translate controls**: Select a target language and display the translated title and content without overwriting the note
 - **Real-time Updates**: Changes reflected immediately
 
 ### Design Elements
@@ -205,4 +218,3 @@ Potential improvements for future versions:
 ---
 
 **Built with ❤️ using Flask, SQLite, and modern web technologies**
-
