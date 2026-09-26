@@ -1,5 +1,10 @@
 from flask import Blueprint, jsonify, request
 from src.models.note import Note, db
+from src.services.translation import (
+    TranslationConfigurationError,
+    TranslationError,
+    translate_note,
+)
 
 note_bp = Blueprint('note', __name__)
 
@@ -74,3 +79,32 @@ def search_notes():
     
     return jsonify([note.to_dict() for note in notes])
 
+
+@note_bp.route('/notes/translate', methods=['POST'])
+def translate_note_content():
+    """Translate a note title and body without changing the saved note."""
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({'error': 'A JSON request body is required'}), 400
+
+    title = data.get('title')
+    content = data.get('content')
+    target_language = data.get('target_language')
+    if not isinstance(title, str) or not isinstance(content, str):
+        return jsonify({'error': 'Title and content must be strings'}), 400
+    if not isinstance(target_language, str) or not target_language.strip():
+        return jsonify({'error': 'Target language is required'}), 400
+    if len(target_language.strip()) > 50:
+        return jsonify({'error': 'Target language must be 50 characters or fewer'}), 400
+
+    try:
+        translation = translate_note(title, content, target_language.strip())
+    except TranslationConfigurationError as error:
+        return jsonify({'error': str(error)}), 503
+    except TranslationError as error:
+        return jsonify({'error': str(error)}), 502
+
+    return jsonify({
+        'target_language': target_language.strip(),
+        'translation': translation,
+    })
