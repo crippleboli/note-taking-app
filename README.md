@@ -30,7 +30,7 @@ The application is deployed and accessible at: **https://3dhkilc88dkk.manus.spac
 - **Flask-CORS**: Cross-origin resource sharing support
 
 ### Database
-- **SQLite**: Lightweight, file-based database for data persistence
+- **PostgreSQL**: Hosted database via Supabase, accessed through SQLAlchemy
 
 ## 📁 Project Structure
 
@@ -46,11 +46,10 @@ notetaking-app/
 │   ├── static/
 │   │   ├── index.html       # Frontend application
 │   │   └── favicon.ico      # Application icon
-│   ├── database/
-│   │   └── app.db           # SQLite database file
 │   └── main.py              # Flask application entry point
 ├── venv/                    # Python virtual environment
 ├── requirements.txt         # Python dependencies
+├── .env.example             # Example environment configuration
 └── README.md               # This file
 ```
 
@@ -79,12 +78,15 @@ notetaking-app/
    pip install -r requirements.txt
    ```
 
-4. **Run the application**
+4. **Configure the database**
+   Copy `.env.example` to `.env` and set `DATABASE_URL` to your Supabase PostgreSQL connection string. Keep the `.env` file private; do not commit it. The URL should include `sslmode=require` when required by your Supabase connection settings.
+
+5. **Run the application**
    ```bash
    python src/main.py
    ```
 
-5. **Access the application**
+6. **Access the application**
    - Open your browser and go to `http://localhost:5001`
 
 ## 📡 API Endpoints
@@ -145,16 +147,7 @@ The response contains a `translation` object with string `title` and `content` f
 
 ## 🔒 Database Schema
 
-### Notes Table
-```sql
-CREATE TABLE note (
-    id INTEGER PRIMARY KEY,
-    title VARCHAR(200) NOT NULL,
-    content TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-```
+Tables are created from the SQLAlchemy models at startup. The integer primary keys, text fields, and timestamps in those models are supported by PostgreSQL.
 
 ## 🚀 Deployment
 
@@ -162,18 +155,17 @@ The application is configured for easy deployment with:
 - CORS enabled for cross-origin requests
 - Host binding to `0.0.0.0` for external access
 - Production-ready Flask configuration
-- Persistent SQLite database
+- Supabase PostgreSQL configured through the `DATABASE_URL` environment variable
 
 ## 🔧 Configuration
 
 ### Environment Variables
 - `FLASK_ENV`: Set to `development` for debug mode
 - `SECRET_KEY`: Flask secret key for sessions
+- `DATABASE_URL`: Required PostgreSQL connection URL for Supabase
+- `OPENAI_API_KEY`: Optional API key used by the AI translation feature
 
-### Database Configuration
-- Database file: `src/database/app.db`
-- Automatic table creation on first run
-- SQLAlchemy ORM for database operations
+The application loads variables from a root `.env` file for local development and reads them from the process environment in deployed environments. It has no local SQLite fallback.
 
 ## 📱 Browser Compatibility
 
@@ -217,4 +209,4 @@ Potential improvements for future versions:
 
 ---
 
-**Built with ❤️ using Flask, SQLite, and modern web technologies**
+**Built with ❤️ using Flask, PostgreSQL, and modern web technologies**
