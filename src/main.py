@@ -29,6 +29,11 @@ if not database_url:
     )
 if database_url.startswith('postgres://'):
     database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+# 清理掉 psycopg2 不识别的 pgbouncer 参数
+if 'pgbouncer=true' in database_url:
+    database_url = database_url.replace('&pgbouncer=true', '').replace('?pgbouncer=true', '')
+
 if not database_url.startswith(('postgresql://', 'postgresql+psycopg2://')):
     raise RuntimeError('DATABASE_URL must be a PostgreSQL connection URL.')
 
@@ -39,7 +44,7 @@ db.init_app(app)
 
 
 @app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
+@app.route('/')
 def serve(path):
     static_folder_path = app.static_folder
     if static_folder_path is None:
