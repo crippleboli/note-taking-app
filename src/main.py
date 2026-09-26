@@ -45,7 +45,7 @@ db.init_app(app)
 
 @app.route('/', defaults={'path': ''})
 @app.route('/')
-def serve(path):
+def serve(path=''):
     static_folder_path = app.static_folder
     if static_folder_path is None:
             return "Static folder not configured", 404
